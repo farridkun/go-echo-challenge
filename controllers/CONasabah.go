@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/net/context"
 )
 
@@ -22,7 +23,10 @@ var validate = validator.New()
 func CreateDataNasabah(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	var nasabah models.Nasabah
+	ePwd := []byte(nasabah.Password)
 	defer cancel()
+
+	hash, err := bcrypt.GenerateFromPassword(ePwd, bcrypt.DefaultCost)
 
 	if err := c.Bind(&nasabah); err != nil {
 		return c.JSON(http.StatusBadRequest, responses.RENasabah{
@@ -45,10 +49,12 @@ func CreateDataNasabah(c echo.Context) error {
 	}
 
 	addNasabah := models.Nasabah{
-		Id:   primitive.NewObjectID(),
-		Cif:  nasabah.Cif,
-		Nama: nasabah.Nama,
-		NoHp: nasabah.NoHp,
+		Id:       primitive.NewObjectID(),
+		Cif:      nasabah.Cif,
+		Nama:     nasabah.Nama,
+		NoHp:     nasabah.NoHp,
+		Email:    nasabah.Email,
+		Password: string(hash),
 	}
 
 	result, err := CONasabah.InsertOne(ctx, addNasabah)
@@ -104,8 +110,10 @@ func UpdateDataNasabah(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	nasabahId := c.Param("nasabahId")
 	var nasabah models.Nasabah
+	ePwd := []byte(nasabah.Password)
 	defer cancel()
 
+	hash, err := bcrypt.GenerateFromPassword(ePwd, bcrypt.DefaultCost)
 	objId, _ := primitive.ObjectIDFromHex(nasabahId)
 
 	if err := c.Bind(&nasabah); err != nil {
@@ -129,12 +137,15 @@ func UpdateDataNasabah(c echo.Context) error {
 	}
 
 	update := bson.M{
-		"cif":  nasabah.Cif,
-		"nama": nasabah.Nama,
-		"noHp": nasabah.NoHp,
+		"cif":      nasabah.Cif,
+		"nama":     nasabah.Nama,
+		"noHp":     nasabah.NoHp,
+		"email":    nasabah.Email,
+		"password": string(hash),
 	}
 
-	result, err := CONasabah.UpdateOne(ctx,
+	result, err := CONasabah.UpdateOne(
+		ctx,
 		bson.M{"id": objId},
 		bson.M{"$set": update},
 	)
