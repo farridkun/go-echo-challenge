@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func EnvMongoURI() string {
+func COenvURI() string {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading environment", err)
