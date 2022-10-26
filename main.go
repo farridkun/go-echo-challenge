@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/farridkun/go-echo-challenge/configs"
 	"github.com/farridkun/go-echo-challenge/routes"
 
@@ -14,5 +16,5 @@ func main() {
 
 	routes.RONasabah(resp)
 
-	resp.Logger.Fatal(resp.Start(":9999"))
+	resp.Logger.Fatal(resp.Start(":" + os.Getenv("PORT")))
 }

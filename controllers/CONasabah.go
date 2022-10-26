@@ -19,7 +19,7 @@ import (
 var CONasabah *mongo.Collection = configs.GetCollection(configs.DB, "nasabah")
 var validate = validator.New()
 
-func COCreateNasabah(c echo.Context) error {
+func CreateDataNasabah(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	var nasabah models.Nasabah
 	defer cancel()
@@ -166,9 +166,93 @@ func UpdateDataNasabah(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, responses.RENasabah{
 		Status:  http.StatusOK,
-		Message: "Granted!, Successfully to getting data Nasabah",
+		Message: "Granted!, Successfully to updating data Nasabah",
 		Data: &echo.Map{
 			"data": updatedNasabah,
 		},
 	})
+}
+
+func DeleteDataNasabah(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	nasabahId := c.Param("nasabahId")
+	defer cancel()
+
+	objId, _ := primitive.ObjectIDFromHex(nasabahId)
+
+	result, err := CONasabah.DeleteOne(ctx, bson.M{"id": objId})
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.RENasabah{
+			Status:  http.StatusInternalServerError,
+			Message: "Reject!, 500 - Internal Server Error",
+			Data: &echo.Map{
+				"data": err.Error(),
+			},
+		})
+	}
+
+	if result.DeletedCount < 1 {
+		return c.JSON(http.StatusNotFound, responses.RENasabah{
+			Status:  http.StatusInternalServerError,
+			Message: "Reject!, 404 - Not Found",
+			Data: &echo.Map{
+				"data": "Nasabah ID was not found!",
+			},
+		})
+	}
+
+	return c.JSON(http.StatusOK, responses.RENasabah{
+		Status:  http.StatusOK,
+		Message: "Granted!, Successfully to updating data Nasabah",
+		Data: &echo.Map{
+			"data": "Granted!, Nasabah successfully deleted",
+		},
+	})
+}
+
+func GetAllNasabah(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	var nasabahAll []models.Nasabah
+	defer cancel()
+
+	results, err := CONasabah.Find(ctx, bson.M{})
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.RENasabah{
+			Status:  http.StatusInternalServerError,
+			Message: "Reject!, 500 - Internal Server Error",
+			Data: &echo.Map{
+				"data": err.Error(),
+			},
+		})
+	}
+
+	defer results.Close(ctx)
+	for results.Next(ctx) {
+		var nasabah models.Nasabah
+		if err = results.Decode(&nasabah); err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.RENasabah{
+				Status:  http.StatusInternalServerError,
+				Message: "Reject!, 500 - Internal Server Error",
+				Data: &echo.Map{
+					"data": err.Error(),
+				},
+			})
+		}
+
+		nasabahAll = append(nasabahAll, nasabah)
+	}
+
+	return c.JSON(http.StatusOK, responses.RENasabah{
+		Status:  http.StatusOK,
+		Message: "Granted!, Successfully to getting all data Nasabah",
+		Data: &echo.Map{
+			"data": nasabahAll,
+		},
+	})
+}
+
+func Index(c echo.Context) error {
+	return c.String(http.StatusOK, "Hi, this is up ⚡")
 }

@@ -7,7 +7,10 @@ import (
 )
 
 func RONasabah(api *echo.Echo) {
-	api.POST("/nasabah", controllers.COCreateNasabah)
+	api.POST("/nasabah", controllers.CreateDataNasabah)
 	api.GET("/nasabah/:nasabahId", controllers.GetDataNasabah)
 	api.PUT("/nasabah/:nasabahId", controllers.UpdateDataNasabah)
+	api.DELETE("/nasabah/:nasabahId", controllers.DeleteDataNasabah)
+	api.GET("/nasabah", controllers.GetAllNasabah)
+	api.GET("/", controllers.Index)
 }
