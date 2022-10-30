@@ -1,4 +1,4 @@
-package configs
+package database
 
 import (
 	"context"
@@ -6,12 +6,13 @@ import (
 	"log"
 	"time"
 
+	"github.com/farridkun/go-echo-challenge/infra"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func ConnectDB() *mongo.Client {
-	client, err := mongo.NewClient(options.Client().ApplyURI(COenvURI()))
+	client, err := mongo.NewClient(options.Client().ApplyURI(infra.Environment()))
 
 	if err != nil {
 		log.Fatal(err)

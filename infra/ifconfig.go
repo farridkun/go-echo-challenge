@@ -1,4 +1,4 @@
-package configs
+package infra
 
 import (
 	"log"
@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func COenvURI() string {
+func Environment() string {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading environment", err)

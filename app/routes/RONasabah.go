@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/farridkun/go-echo-challenge/controllers"
+	"github.com/farridkun/go-echo-challenge/app/controllers"
 
 	"github.com/labstack/echo/v4"
 )

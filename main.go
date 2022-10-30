@@ -1,10 +1,9 @@
 package main
 
 import (
-	"os"
-
-	"github.com/farridkun/go-echo-challenge/configs"
-	"github.com/farridkun/go-echo-challenge/routes"
+	"github.com/farridkun/go-echo-challenge/app/routes"
+	"github.com/farridkun/go-echo-challenge/cmd"
+	"github.com/farridkun/go-echo-challenge/infra/database"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,9 +11,9 @@ import (
 func main() {
 	resp := echo.New()
 
-	configs.ConnectDB()
+	database.ConnectDB()
 
 	routes.RONasabah(resp)
 
-	resp.Logger.Fatal(resp.Start(":" + os.Getenv("PORT")))
+	cmd.RunServer(resp)
 }

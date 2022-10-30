@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/farridkun/go-echo-challenge/configs"
-	"github.com/farridkun/go-echo-challenge/helpers"
-	"github.com/farridkun/go-echo-challenge/models"
-	"github.com/farridkun/go-echo-challenge/responses"
+	"github.com/farridkun/go-echo-challenge/app/models"
+	"github.com/farridkun/go-echo-challenge/app/responses"
+	"github.com/farridkun/go-echo-challenge/infra/database"
+	"github.com/farridkun/go-echo-challenge/pkg/auth"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -17,7 +17,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-var CONasabah *mongo.Collection = configs.GetCollection(configs.DB, "nasabah")
+var CONasabah *mongo.Collection = database.GetCollection(database.DB, "nasabah")
 var validate = validator.New()
 
 func CreateDataNasabah(c echo.Context) error {
@@ -25,7 +25,7 @@ func CreateDataNasabah(c echo.Context) error {
 	var nasabah models.Nasabah
 	defer cancel()
 
-	hash, err := helpers.EncryptPassword(nasabah.Password)
+	hash, err := auth.EncryptPassword(nasabah.Password)
 
 	if err := c.Bind(&nasabah); err != nil {
 		return c.JSON(http.StatusBadRequest, responses.RENasabah{
@@ -111,7 +111,7 @@ func UpdateDataNasabah(c echo.Context) error {
 	var nasabah models.Nasabah
 	defer cancel()
 
-	hash, err := helpers.EncryptPassword(nasabah.Password)
+	hash, err := auth.EncryptPassword(nasabah.Password)
 	objId, _ := primitive.ObjectIDFromHex(nasabahId)
 
 	if err := c.Bind(&nasabah); err != nil {
